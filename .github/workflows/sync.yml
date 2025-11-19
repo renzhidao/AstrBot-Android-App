@@ -1,0 +1,33 @@
+name: Upstream Sync
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # 每天 UTC 0点 (北京时间早8点) 自动同步
+  workflow_dispatch: # 允许手动点按钮触发
+
+jobs:
+  sync_latest_from_upstream:
+    name: Sync latest commits from upstream repo
+    runs-on: ubuntu-latest
+    if: ${{ github.event.repository.fork }}
+
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v3
+
+      - name: Sync upstream changes
+        id: sync
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+        with:
+          upstream_sync_repo: zz6zz666/AstrBot-Android-App
+          upstream_sync_branch: master
+          target_sync_branch: master
+          target_repo_token: ${{ secrets.GITHUB_TOKEN }} # 自动使用内置 Token，无需配置
+          test_mode: false
+
+      - name: Sync check
+        if: steps.sync.outputs.has_new_commits == 'true'
+        run: echo "✅ 已成功同步上游新代码"
