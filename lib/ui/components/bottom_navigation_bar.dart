@@ -1,0 +1,49 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../controllers/terminal_controller.dart';
+
+class CustomBottomNavigationBar extends StatelessWidget {
+  final int currentIndex;
+  final Function(int) onTap;
+  
+  const CustomBottomNavigationBar({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // 获取 HomeController 实例
+    final HomeController homeController = Get.find<HomeController>();
+    
+    // 检查 NapCat WebUI 是否启用
+    final bool napCatEnabled = homeController.napCatWebUiEnabled.get() ?? false;
+    
+    // 动态构建导航栏项目
+    final List<BottomNavigationBarItem> navItems = [
+      const BottomNavigationBarItem(
+        icon: Icon(Icons.smart_toy),
+        label: 'AstrBot',
+      ),
+      if (napCatEnabled)
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.pets),
+          label: 'NapCat',
+        ),
+      const BottomNavigationBarItem(
+        icon: Icon(Icons.settings),
+        label: '设置',
+      ),
+    ];
+
+    return BottomNavigationBar(
+      currentIndex: currentIndex >= navItems.length ? navItems.length - 1 : currentIndex,
+      onTap: onTap,
+      backgroundColor: Colors.white,
+      selectedItemColor: Theme.of(context).primaryColor,
+      unselectedItemColor: Colors.grey,
+      items: navItems,
+    );
+  }
+}

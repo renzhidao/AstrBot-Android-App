@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:ui';
 import 'package:flutter_pty/flutter_pty.dart';
 import 'package:get/get.dart';
 import 'package:global_repository/global_repository.dart';
@@ -104,11 +103,11 @@ class HomeController extends GetxController {
         _isAdapterConnected = true;
         bumpProgress();
         
-        // 如果应用当前在前台，则立即打开webview
+        // 如果应用当前在前台，则立即打开主页
         if (_isAppInForeground) {
           Future.microtask(() {
             // 使用路由跳转
-            Get.toNamed(AppRoutes.webview);
+            Get.toNamed(AppRoutes.home);
             webviewHasOpen = true; // 只有真正打开webview时才设置为true
           });
         }
@@ -240,7 +239,7 @@ class HomeController extends GetxController {
           'NapCat 登录失败',
           errorMsg,
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.withOpacity(0.8),
+          backgroundColor: Colors.red.withValues(alpha: 0.8),
           colorText: Colors.white,
           duration: const Duration(seconds: 5),
         );
@@ -364,7 +363,7 @@ class HomeController extends GetxController {
     bumpProgress();
 
     // 写入并执行脚本
-    File('${RuntimeEnvir.homePath}/common.sh').writeAsStringSync('$commonScript');
+    File('${RuntimeEnvir.homePath}/common.sh').writeAsStringSync(commonScript);
 
     initWebviewListener();
     bumpProgress();
@@ -404,13 +403,13 @@ class HomeController extends GetxController {
       LifecycleObserver(
         onResume: () {
           _isAppInForeground = true;
-          // 当应用回到前台且适配器已连接但webview未打开时，打开webview
-          if (_isAdapterConnected && !webviewHasOpen) {
-            Future.microtask(() {
-              Get.toNamed(AppRoutes.webview);
-              webviewHasOpen = true;
-            });
-          }
+          // 当应用回到前台且适配器已连接但webview未打开时，打开主页
+        if (_isAdapterConnected && !webviewHasOpen) {
+          Future.microtask(() {
+            Get.toNamed(AppRoutes.home);
+            webviewHasOpen = true;
+          });
+        }
         },
         onPause: () {
           _isAppInForeground = false;
